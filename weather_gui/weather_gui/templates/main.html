@@ -1,0 +1,294 @@
+﻿<style>
+ul#nav{
+	list-style:none;
+	position:relative; 
+	z-index:2;
+	top:1px;
+	display:table;
+	border:1px solid blue;
+}
+ul#nav li {
+	float:left;
+}
+ul#nav li a {
+	background:#CCCCFF;
+	color:#222;
+	display:block;
+	padding:6px 10px;
+	text-decoration:none;
+	/*margin:0;*/
+}
+ul#nav li a.selected {
+	border-bottom:1px solid #fff;
+	color:#344385;
+	background:#fff;
+}
+div#top_left{
+	margin: 50px 80px;
+	display: inline-block;
+}
+div#top_right{
+	float: right;
+	margin: 50px 80px;
+	display: inline;
+}
+#city_input{
+	float: left;
+} 
+
+#setting{
+	float: right;
+	margin: 0px 20px;
+}
+#date{
+	float: right;
+}
+#bottom_right{
+	display: inline;
+}
+#tabs{
+	float: left;
+	margin: 100px 20px 25px;
+}
+#forecast{
+	width: 1000px;
+    margin-left: 300px;
+    margin-right: 100px;
+	float: left;
+	margin-top: 100px;
+
+}
+#city{
+	margin-left: 700px;
+	margin-right: auto;
+	font-size: 28px;
+}
+table#weather{
+	
+	border-collapse: collapse;
+	border: 2px solid blue; 
+	width: 200%;
+	background-color: #CCCCFF;
+	font-size: 24px;
+}	
+.weather-table{
+	vertical-align: top;
+	text-align: center;
+	height: 200px;
+	background-color: #CCCCFF;
+}
+.tabs-table{
+	vertical-align: top;
+	text-align: center;
+	
+}
+</style>
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
+    </head>
+	<body>
+		<div id="top_left">
+			<div id="city_input">
+                <!--<form action="." id="form_city" method="post">-->
+                    <input id="city_name" type="text" placeholder="Enter city name here" />
+                    <button id="btn_search" type="button" class="btn btn-primary" >Search</button>
+                <!--</form>-->
+			</div>
+			</div>
+			<div id="top_right">
+				<div id="setting">
+                    <!--onclick="get_city()"-->
+                    <a href="{{ url_for('settings') }}"> <button type="button" class="btn btn-info">Settings</button></a>
+				</div>
+				<div id="date">
+					{{date}}
+				</div>
+			</div>
+		<div id="city">
+			<h1 id="name">Welcome to Weather Search</h1>
+		</div>
+        <div id="bottom_right">
+            <div id="forecast">
+                <table id="weather">
+                    <thead>
+                        <tr class="weather-table">
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="weather-table">
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div>
+                <div id="tabs">
+                    <ul id="nav">
+                        <li>
+                            <a class="selected" id="saved_cities">Saved Cities</a>
+                            {% if saved_results %}
+                            <table id="tbl-sv" class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>City</th>
+                                        <th>Temperature</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for result in saved_results%}
+                                    <tr class="tabs-table">
+                                        <td><input type="hidden" value="{{ result[0] }}" />{{ result[1] }}</td>
+                                        <td>{{ result[2] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <a id="history">History</a>
+                            <table id="tbl-hist" class="table table-hover" style="display:none;">  
+                                <thead>
+                                    <tr>
+                                        <th>City</th>
+                                        <th>Temperature</th>
+                                    </tr>
+                                </thead>
+                                {% if hist %}
+                                <tbody>
+                                    {% for hist in history %}
+                                    <tr class="tabs-table">
+                                        <td>{{ hist[0] }}</td>
+                                        <td>{{ hist[1]}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                {% endif %}
+                            </table>
+                           
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!--<div id="bottom_right">
+            <div id="tabs">
+                <ul id="nav">
+                    <li>
+                        <a class="selected" id="saved_cities">Saved Cities</a>
+                        <table id="tbl-sv">
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Temperature</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="tabs-table">
+                                    <td>Tampa, FL</td>
+                                    <td>F</td>
+                                </tr>
+                                <tr class="tabs-table">
+                                    <td>Tampa, FL</td>
+                                    <td>C</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li>
+                        <a id="history">History</a>
+                        <table id="tbl-hist" style="visibility:hidden;">
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Temperature</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="tabs-table">
+                                    <td>Tampa, FL</td>
+                                    <td>F</td>
+                                </tr>
+                                <tr class="tabs-table">
+                                    <td>Tampa, FL</td>
+                                    <td>C</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="forecast">
+                <table id="weather">
+                    <thead>
+                        <tr class="weather-table">
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="weather-table">
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                            <td>Sunny</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>-->
+        <script type=text/javascript src="{{ url_for('static', filename='scripts/jquery-1.10.2.min.js') }}"></script>
+
+        <script type=text/javascript>
+            $("#history").click(function(){
+                $("#history").attr('class', 'selected');
+                $("#saved_cities").attr('class', '');
+                $("#tbl-sv").css("display", "none");
+                $("#tbl-hist").css("display", "inline");
+            });
+            $("#saved_cities").click(function(){
+                $("#history").attr('class', '');
+                $("#saved_cities").attr('class', 'selected');
+                $("#tbl-sv").css("display", "inline");
+                $("#tbl-hist").css("display", "none");
+            });
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+            $("#btn_search").click(function(){
+                $.getJSON($SCRIPT_ROOT + '/get_city', {
+                    city: $("#city_name").val()
+                }, function(data){
+                    console.log(data);
+                    $("#name").text(data.city_name);
+                });
+            });
+
+
+       </script>
+
+	</body>
+
+
+</html>
+
