@@ -1,0 +1,71 @@
+﻿<style>
+div#title{
+	margin: 100px auto 80px;
+	text-align: center;
+}
+div#login{
+	margin: 0px auto;
+	width: 500px;
+	padding: 10px;
+	text-align: center;
+	border: 4px solid blue;
+	background-color: #CCCCFF;
+}
+div#btns{
+	margin: 10px 20px;
+}
+</style>
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
+       {{ JSGlue.include() }}
+    </head>
+	<body>
+        <div id="title">
+            <h1>Weather Search</h1>
+        </div>
+		<div id="login">
+			<form>
+				<h3>Log in or continue as guest</h3>
+				Username: <input id="user" type="text" placeholder="Username" style="margin-bottom: 10px;"><br>
+				Password:  <input id="pass" type="password" placeholder="Password"><br>
+				<div id="btns">
+					<button type="button" id="log" style="margin-bottom: 10px; margin-right: 5px;" onclick="check_login()" class="btn btn-primary" >Login</button>
+					<a href="{{ url_for('login_new') }}"><button type="button" id="new" style="margin-bottom: 10px;" class="btn btn-primary" >New User?</button><br></a>
+					<a href="{{ url_for('home', username='guest') }}"><button type="button" id="guest" class="btn btn-success" >Continue as Guest</button></a>
+				</div>
+			</form>
+		</div>
+
+        <script type=text/javascript src="{{ url_for('static', filename='scripts/jquery-1.10.2.min.js') }}"></script>
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+            function check_login() {
+                var user = $("#user").val();
+                var pass = $("#pass").val();
+                var dt;
+                $.getJSON($SCRIPT_ROOT + '/get_login', {
+                    user: user,
+                    password: pass
+                }, function(data){
+                    console.log(data);
+                    if(data.message[0][0] == "error"){
+                        alert("Incorrect username or password. Please try again");
+                    }else{
+                        dt = data.message[0][1];
+                        //Flask.url_for("home", {"username": data.message[0][1]});
+                        window.location.replace($SCRIPT_ROOT+"home/"+dt);
+                    }
+                });
+
+                //$.ajax({
+                //    type: 'GET',
+                //    url: Flask.url_for('home', {'username':data})
+                //});
+            }
+        </script>
+	</body>
+</html>

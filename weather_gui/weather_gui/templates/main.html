@@ -1,0 +1,303 @@
+﻿<style>
+ul#tab-nav{
+	list-style:none;
+	position:relative; 
+	z-index:2;
+	top:1px;
+	display:table;
+	border:1px solid blue;
+}
+ul#tab-nav li a {
+	background:#CCCCFF;
+	color:#222;
+	display:block;
+	padding:6px 10px;
+	text-decoration:none;
+}
+ul#tab-nav li a.selected {
+	border-bottom:1px solid #fff;
+	color:#344385;
+	background:#fff;
+}
+div#top_left{
+	margin: 50px 80px;
+	display: inline-block;
+}
+div#top_right{
+	float: right;
+	margin: 50px 80px;
+	display: inline;
+}
+#city_input{
+	float: left;
+} 
+
+#setting{
+	float: right;
+	margin: 0px 20px;
+}
+#date{
+	float: right;
+}
+#bottom_right{
+	display: inline;
+}
+#tabs{
+	float: left;
+	margin: 100px 20px 25px;
+}
+#forecast{
+	width: 1000px;
+    margin-left: 300px;
+    margin-right: 100px;
+	float: left;
+	margin-top: 100px;
+
+}
+#city{
+	margin-left: 700px;
+	margin-right: auto;
+	font-size: 28px;
+}
+#log{
+    margin: 10px;
+}
+table#weather{
+	
+	border-collapse: collapse;
+	border: 2px solid blue; 
+	width: 200%;
+	background-color: #CCCCFF;
+	font-size: 24px;
+}	
+.weather-table{
+	vertical-align: top;
+	text-align: center;
+	height: 200px;
+	background-color: #CCCCFF;
+}
+.tabs-table{
+	vertical-align: top;
+	text-align: center;
+	
+}
+</style>
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
+    </head>
+	<body>
+		<div id="top_left">
+			<div id="city_input">
+                <!--<form action="." id="form_city" method="post">-->
+                    <input id="city_name" type="text" placeholder="Enter city name here" />
+                    <button id="btn_search" type="button" class="btn btn-primary" >Search</button>
+                <!--</form>-->
+			</div>
+            <div id="input_temp" style="margin-top:50px;">
+                <input type="radio" id="t1" name="temp" value="F" style="margin-right:5px;" checked="checked"/> Fahrenheit
+                <input type="radio" id="t2" name="temp" value="C" style="margin-right:5px; margin-left:10px;"/> Celsius
+                <input type="radio" id="t3" name="temp" value="K" style="margin-right:5px; margin-left:10px;"/> Kelvin
+            </div>
+			</div>
+			<div id="top_right">
+                <!--<div id="log">
+                    <a href="{{ url_for('login') }}"> <button type="button" class="btn btn-danger">Back</button></a>
+                </div>-->
+				<div id="setting">
+                    <a href="{{ url_for('settings') }}"> <button type="button" class="btn btn-info">Settings</button></a>
+                    <div id="log">
+                        <a href="{{ url_for('login') }}"> <button type="button" class="btn btn-danger">Back</button></a>
+                    </div>
+				</div>
+				<div id="date">
+					{{date}}
+				</div>
+			</div>
+		<div id="city">
+			<h1>Welcome to Weather Search</h1>
+            <h2 id="name" style="margin: 0px 100px;"></h2>
+		</div>
+        <div id="bottom_right">
+            <div id="forecast">
+                <table id="weather">
+                    <thead id="weatherHead">
+                    </thead>
+                    <tbody id="weatherBody">
+                        <tr><td>Search for a city to start</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div>
+                <div id="tabs">
+                    <ul id="tab-nav" class="nav nav-tabs">
+                        <li role="presentation">
+                            <a class="selected" id="saved_cities">Saved Cities</a>
+                            <div style="margin: 5px 30px;">
+                                {% if saved_results %}
+                                <table id="tbl-sv" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>City</th>
+                                            <th>Temperature</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in saved_results%}
+                                        <tr class="tabs-table" onclick="rowClick('{{result[1]}} ', '{{result[2]}}')">
+                                            <td><input type="hidden" value="{{ result[0] }}" />{{ result[1] }}</td>
+                                            <td>{{ result[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% else %}
+                                    <p id="tbl-sv">Must be logged in to save cities</p>
+                                {% endif %}
+                            </div>
+                        </li>
+                        <li role="presentation">
+                            <a id="history">History</a>
+                            <div style="padding: 5px 50px 5px 0px;">
+                                <table id="tbl-hist" class="table table-hover" style="display:none; float:left;">
+                                    <thead>
+                                        <tr>
+                                            <th>City</th>
+                                            <th>Temperature</th>
+                                        </tr>
+                                    </thead>
+                                    {% if history != "" %}
+                                    <tbody>
+                                        {% for hist in history %}
+                                        <tr class="tabs-table">
+                                            <td>{{ hist[0] }}</td>
+                                            <td>{{ hist[1]}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    {% else %}
+                                    <tbody id="hist_data">
+                                        <tr class="tabs-table">
+                                            <td>No History</td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+  
+        <script type=text/javascript src="{{ url_for('static', filename='scripts/jquery-1.10.2.min.js') }}"></script>
+
+        <script type=text/javascript>
+            var arr = [];
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+            $("#history").click(function(){
+                $("#history").attr('class', 'selected');
+                $("#saved_cities").attr('class', '');
+                $("#tbl-sv").css("display", "none");
+                $("#tbl-hist").css("display", "inline");
+            });
+            $("#saved_cities").click(function(){
+                $("#history").attr('class', '');
+                $("#saved_cities").attr('class', 'selected');
+                $("#tbl-sv").css("display", "inline");
+                $("#tbl-hist").css("display", "none");
+            });  
+
+            $("#btn_search").click(function(){
+                var temp = "F";
+                temp = $('input[name="temp"]:checked').val();
+                //console.log(temp);
+                $.getJSON($SCRIPT_ROOT + '/get_city_forecast', {
+                    city: $("#city_name").val(),
+                    temp: temp
+                }, function(data){
+                    var hist = {"city":$("#city_name").val(), "temp":temp};
+                    arr.push(hist);
+                    $("#hist_data").html("");
+                    var hist_fill = "";
+                    if(arr.length > 10){
+                        arr.shift();
+                    }
+                    for(var j=0; j < arr.length; j++){
+                        clk = "'"+ arr[j].city+ "', '"+ arr[j].temp +"'";
+                        hist_fill += '<tr class="tabs-table" onclick="rowClick('+clk+')"><td>' + arr[j].city + '</td><td>' + arr[j].temp + '</td>';
+                        hist_fill += '</tr>';
+                    }
+            
+                    $("#hist_data").append(hist_fill);
+                    $("#name").text(data.city_name);
+                    $("#weatherHead").html("");
+                    $("#weatherBody").html("");
+                    var thead = '<tr class="weather-table">';
+                    var tbody = '<tr class="weather-table">';
+                    var item = data.five_day;
+                    for(var i=0; i < item.length; i++){
+                        thead += '<th style="text-align: center; padding-top:25px;">' + item[i][1][3] + '<br>' + item[i][1][1] + "/" + item[i][1][2] + "/" + item[i][1][0] + "</th>";
+                        tbody += '<td><img src="' + item[i][2][0] + '"/><br>' + item[i][0] + '</td>';
+                    }
+                    thead += '</tr>';
+                    tbody += '</tr>';
+                    
+                    $("#weatherHead").append(thead);
+                    $("#weatherBody").append(tbody);
+                });
+            });
+
+            function rowClick(city, temp){
+                $.getJSON($SCRIPT_ROOT + '/get_city_forecast', {
+                    city: city,
+                    temp: temp
+                }, function(data){
+                    var hist = {"city":city, "temp":temp};
+                    arr.push(hist);
+                    $("#hist_data").html("");
+                    var hist_fill = '';
+                    if(arr.length > 10){
+                        arr.shift();
+                    }
+                    for(var j=0; j < arr.length; j++){
+                        clk = "'"+ arr[j].city+ "', '"+ arr[j].temp +"'";
+                        hist_fill += '<tr class="tabs-table" onclick="rowClick('+clk+')"><td>' + arr[j].city + '</td><td>' + arr[j].temp + '</td>';
+                        hist_fill += '</tr>';
+                    }
+                    
+                    $("#hist_data").append(hist_fill);
+                    $("#city_name").val("");
+                    $("#name").text(data.city_name);
+                    $("#weatherHead").html("");
+                    $("#weatherBody").html("");
+                    var thead = '<tr class="weather-table">';
+                    var tbody = '<tr class="weather-table">';
+                    var item = data.five_day;
+                    console.log(data);
+                    for(var i=0; i < item.length; i++){
+                        thead += '<th style="text-align: center; padding-top:25px;">' + item[i][1][3] + '<br>' + item[i][1][1] + "/" + item[i][1][2] + "/" + item[i][1][0] + "</th>";
+                        tbody += '<td><img src="' + item[i][2][0] + '" height="100" width="100"/><br>' + item[i][0] + '</td>';
+                    }
+                    thead += '</tr>';
+                    tbody += '</tr>';
+                  
+                    $("#weatherHead").append(thead);
+                    $("#weatherBody").append(tbody);
+                });
+            }
+       </script>
+
+	</body>
+
+
+</html>
+

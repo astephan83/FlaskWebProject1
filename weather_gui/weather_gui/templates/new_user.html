@@ -1,0 +1,68 @@
+﻿<style>
+div#title{
+	margin: 100px auto 80px;
+	text-align: center;
+}
+div#login{
+	margin: 0px auto;
+	width: 500px;
+	padding: 10px;
+	text-align: center;
+	border: 4px solid blue;
+	background-color: #CCCCFF;
+}
+div#btns{
+	margin: 30px 20px 0px;
+}
+</style>
+
+<html>
+	<head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
+	</head>
+	<body>
+        <div id="title">
+            <h1>New User Information</h1>
+        </div>
+		<div id="login">
+			<form>
+				<h3>Please enter username and password</h3>
+				Username: <input id="user" type="text" placeholder="Username" style="margin-bottom: 10px;"><br>
+				Password: <input id="password" type="password" placeholder="Password" style="margin-bottom: 10px;"><br>
+				Re-Enter Password: <input id="password2" type="password" placeholder="Re-enter Password"><br>
+				<div id="btns">
+					<a href="{{ url_for('login') }}"><button type="button" id="log" style="margin-bottom: 10px; margin-right: 50px;" class="btn btn-danger">Cancel</button></a>
+					<button type="button" id="new" style="margin-bottom: 10px;" class="btn btn-primary" onclick="save()">Save</button><br>
+				</div>
+			</form>
+		</div>
+
+        <script type=text/javascript src="{{ url_for('static', filename='scripts/jquery-1.10.2.min.js') }}"></script>
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+            function save() {
+                var user = $("#user").val();
+                var pass = $("#password").val();
+                var pass2 = $("#password2").val();
+                if(pass == pass2){
+                    $.getJSON($SCRIPT_ROOT + '/save_login', {
+                        user: user,
+                        password: pass
+                    }, function(data){
+                        console.log(data.message);
+                        if(data.message == "Successfully Saved"){
+                            alert(data.message);
+                            window.location.replace($SCRIPT_ROOT+"login");
+                        }
+                        
+                    });
+                }else{
+                    alert("Error: passwords didn't match. Please try again")
+                }
+            }
+
+       </script>
+	</body>
+</html>
